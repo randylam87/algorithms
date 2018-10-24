@@ -28,8 +28,6 @@
         (10)     (9)      (8)    (7)
 */
 
-
-
 const matrix = length => {
   // Set up 2D matrix filled with 0s
   let matrix = new Array(length);
@@ -41,43 +39,58 @@ const matrix = length => {
   let column = 0;
   let move = 1;
 
-  let isEmpty = (matrix[row][column] === 0);
-  const isInBounds =(0<=column && column<=length-1 && 0<=row && row<=length-1);
   const placeValue = value => { 
     console.log(`Okay to place ${value} to [${row}][${column}]`);
     matrix[row][column] = value;
     console.log(matrix);
   }
 
-  function moveToNextCell() {
-    console.log('Moving to next cell')
-
-    if((column+move)>=0 && (column + move)<= length-1){
-      console.log('Moving column');
-      column = column + move;
+  function changeDirection() {
+    if (move === 1) {
+      console.log('Changing direction from incrementing to decrementing');
+      move = -1;
     } else {
-      console.log('Moving row')
-      if(row + move > length -1 || row + move < 0 || !isEmpty) {
-        console.log('Unable to move forward, changing direction', row)
-        if(move === 1) {
-          console.log('Changing direction from incrementing to decrementing');
-          move = -1;
-        } else {
-          move = 1;
-          console.log('Changing direction from decrementing to incrementing');
-        }
+      console.log('Changing direction from decrementing to incrementing');
+      move = 1;
+    }
+  }
 
-        if(isEmpty){
-          column = column + move;
+  function moveColumn() {
+    console.log('Moving column');
+    column = column + move;
+  };
+  function moveRow() {
+    console.log('Moving row');
+    row = row + move;
+  };
+
+  function moveToNextCell() {
+    console.log('Moving to next cell');
+    if (matrix[row][column + move] !== undefined){
+      if(matrix[row][column+move] === 0){
+        moveColumn();
+      } else {
+        if(matrix[row+move][column] === 0) {
+          moveRow();
         } else {
-          row = row + move;
+          changeDirection();
+          moveColumn();
+        }
+      }
+    } 
+    else {
+      console.log(`[${row+move}][${column}]`,matrix[row+move])
+      if(matrix[row + move] !== undefined) {
+        if(matrix[row+move][column] === 0){
+          moveRow();
+        } else {
+          changeDirection();
+          moveColumn();
         }
       } else {
-        if(isEmpty) {
-          row = row + move;
-        } else {
-          column = column + move;
-        }
+        console.log('In else')
+        changeDirection();
+        moveColumn();
       }
     }
     console.log(`Now on [${row}][${column}]`);
@@ -85,21 +98,20 @@ const matrix = length => {
 
   console.log('🤯 🤯 🤯 🤯 🤯');
   for(let value = 1; value <= (length*length); value ++) {
-    isEmpty = (matrix[row][column] === 0);
+    const isEmpty = (matrix[row][column] === 0);
+    const isInBounds = !(matrix[row][column] === undefined);
+
     console.log(`Checking to see if we can place ${value} in [${row}][${column}] (Current value: ${matrix[row][column]}) `);
     if(isEmpty && isInBounds){
       placeValue(value);
       moveToNextCell();
     } else {
-      console.log(`
-Unable to add value:
-${!isEmpty ? 'Cell is not empty' : 'We are not in bounds'}
-      `)
+      console.log(`Unable to add value: ${!isEmpty ? 'Cell is not empty' : ''} ${!isInBounds ? 'We are not in bounds' : ''}`)
       moveToNextCell();
       placeValue(value);
       moveToNextCell();
     }
-    console.log('🤯 🤯 🤯 🤯 🤯');
+    console.log('🤯 🤯 🤯 🤯 🤯\n');
   }
 
   return matrix
